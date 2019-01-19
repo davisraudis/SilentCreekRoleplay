@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SampSharp.Core" Version="0.8.0" />
+    <PackageReference Include="SampSharp.GameMode" Version="0.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="env\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClassLibrary1\SilentCreekRoleplay.DataLayer.csproj" />
+    <ProjectReference Include="..\DataLayer\SilentCreekRoleplay.DataLayer.csproj" />
+  </ItemGroup>
+
+</Project>
