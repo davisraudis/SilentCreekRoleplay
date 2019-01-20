@@ -7,14 +7,8 @@ namespace SilentCreekRoleplay
     {
         static void Main(string[] args)
         {
-
-            /*using (var db = new SilentCreekRoleplayContext())
-            {
-                var p = db.Players.Add(new DataLayer.Entities.Player { Name = "haha" });
-            }*/
             // GameModeStartBehaviour.FakeGmx - A fake GMX is particularly useful while you are developing your game mode. 
             // GameModeStartBehaviour.Gmx - This is the default start behaviour and should be used for servers running in production.
-            
             #pragma warning disable CS0437 // Type conflicts with imported namespace
             new GameModeBuilder().UseStartBehaviour(GameModeStartBehaviour.FakeGmx).Use<GameMode>().Run();
             #pragma warning restore CS0437 // Type conflicts with imported namespace

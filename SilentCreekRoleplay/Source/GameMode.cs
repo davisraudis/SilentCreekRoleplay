@@ -5,10 +5,14 @@ using SilentCreekRoleplay.Server.Source.Events;
 using System;
 using SilentCreekRoleplay.DataLayer;
 using SilentCreekRoleplay.Server;
+using System.Collections.Generic;
+using SilentCreekRoleplay.Server.Source;
 
 public class GameMode : BaseMode
 {
     #region Overrides of BaseMode
+
+    public List<PlayerSession> PlayerSessions = new List<PlayerSession>();
 
     protected override void OnInitialized(EventArgs e)
     {
@@ -16,10 +20,7 @@ public class GameMode : BaseMode
         Console.WriteLine(" Blank Gamemode by your name here");
         Console.WriteLine("----------------------------------\n");
 
-        SetGameModeText("sasa");
-        /*
-         * TODO: Do your initialisation and loading of data here.
-         */
+        SetGameModeText($"{ServerUtils.ServerName} {ServerUtils.ServerVersion}");
         base.OnInitialized(e);
     }
 
@@ -28,8 +29,9 @@ public class GameMode : BaseMode
         base.LoadControllers(controllers);
 
         // Register events
-        controllers.Add(new OnPlayerConnect());
+        controllers.Add(new OnPlayerConnect(PlayerSessions));
         controllers.Add(new OnPlayerRequestClass());
+        controllers.Add(new OnPlayerDisconnect(PlayerSessions));
     }
     #endregion
 }

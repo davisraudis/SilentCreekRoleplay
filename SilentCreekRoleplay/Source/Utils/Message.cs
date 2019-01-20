@@ -60,10 +60,10 @@ namespace SilentCreekRoleplay.Server.Source
 
             var messageToSend = message;
 
-            messageToSend.Insert(0, messageStart);
-            messageToSend.Insert(message.Length, messageEnd);
+            messageToSend = messageToSend.Insert(0, messageStart);
+            messageToSend = messageToSend.Insert(messageToSend.Length, messageEnd);
 
-            player.SendClientMessage(messageColor, message);
+            player.SendClientMessage(messageColor, messageToSend);
         }
     }
 }
