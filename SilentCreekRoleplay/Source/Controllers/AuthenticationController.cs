@@ -1,4 +1,5 @@
-﻿using SampSharp.GameMode.Display;
+﻿using SampSharp.GameMode.Definitions;
+using SampSharp.GameMode.Display;
 using SampSharp.GameMode.Events;
 using SampSharp.GameMode.World;
 using SilentCreekRoleplay.DataLayer;
@@ -18,12 +19,12 @@ namespace SilentCreekRoleplay.Server.Controllers
         private List<PlayerSession> _playerSessions = new List<PlayerSession>();
 
         private InputDialog registerDialog = new InputDialog("Register",
-                                            $@"Welcome to {ServerUtils.ServerName}                                               
+                                            $@"Welcome to {ServerUtils.ServerName}                                              
                                             \nPlease register by typing password below:",
                                             true,
                                             "Register");
         private InputDialog loginDialog = new InputDialog("Login",
-                                            @"Welcome to {ServerUtils.ServerName}                                             
+                                            $@"Welcome to {ServerUtils.ServerName}                                             
                                             \nPlease login by entering password into the inputbox below:",
                                             true,
                                             "Login");
@@ -47,22 +48,29 @@ namespace SilentCreekRoleplay.Server.Controllers
 
         private void RegisterDialogResponse(object sender, DialogResponseEventArgs response)
         {
-            if (response.InputText.Length > 6 && response.InputText.Length < 32)
+            if (response.DialogButton == DialogButton.Left)
             {
-                using (SilentCreekRoleplayContext db = new SilentCreekRoleplayContext())
+                if (response.InputText.Length > 6 && response.InputText.Length < 32)
                 {
-                    try
+                    using (SilentCreekRoleplayContext db = new SilentCreekRoleplayContext())
                     {
-                        _playerManager.RegisterPlayer(db, response.Player.Name, response.InputText);
-                        db.SaveChanges();
+                        try
+                        {
+                            _playerManager.RegisterPlayer(db, response.Player.Name, response.InputText);
+                            db.SaveChanges();
 
-                        loginDialog.Show(response.Player);
+                            loginDialog.Show(response.Player);
+                        }
+                        catch (Exception)
+                        {
+                            Message.SendServerMessageToPlayer(response.Player, MessageType.Error, "There has been an error on the server, please try again.");
+                            registerDialog.Show(response.Player);
+                        }
                     }
-                    catch (Exception)
-                    {
-                        Message.SendServerMessageToPlayer(response.Player, MessageType.Error, "There has been an error on the server, please try again.");
-                        registerDialog.Show(response.Player);
-                    }
+                }
+                else
+                {
+                    registerDialog.Show(response.Player);
                 }
             }
             else
@@ -73,28 +81,38 @@ namespace SilentCreekRoleplay.Server.Controllers
 
         private void LoginDialogResponse(object sender, DialogResponseEventArgs response)
         {
-            using (SilentCreekRoleplayContext db = new SilentCreekRoleplayContext())
+            if (response.DialogButton == DialogButton.Left)
             {
-                try
+                using (SilentCreekRoleplayContext db = new SilentCreekRoleplayContext())
                 {
-                    _playerManager.LoginPlayer(db, response.Player.Name, response.InputText);
-                    Message.SendServerMessageToPlayer(response.Player, MessageType.Information, $"You have logged in as {response.Player.Name}.");
-                    _playerSessions.Add(new PlayerSession
+                    try
                     {
-                        Player = response.Player,
-                        Authenticated = true
-                    });
+                        _playerManager.LoginPlayer(db, response.Player.Name, response.InputText);
+
+                        var playerEntity = _playerManager.GetPlayerEntityByPlayerName(db, response.Player.Name);
+                        Message.SendServerMessageToPlayer(response.Player, MessageType.Information, $"You have logged in as {response.Player.Name}.");
+                        _playerSessions.Add(new PlayerSession
+                        {
+                            Player = response.Player,
+                            PlayerData = playerEntity,
+                            Authenticated = true
+                        });
+                    }
+                    catch (FailedLoginException)
+                    {
+                        Message.SendServerMessageToPlayer(response.Player, MessageType.Error, "The credentials you have input in the dialog are invalid! Please try again.");
+                        loginDialog.Show(response.Player);
+                    }
+                    catch (Exception)
+                    {
+                        Message.SendServerMessageToPlayer(response.Player, MessageType.Error, "There has been an error on the server, please try again.");
+                        loginDialog.Show(response.Player);
+                    }
                 }
-                catch (FailedLoginException)
-                {
-                    Message.SendServerMessageToPlayer(response.Player, MessageType.Error, "The credentials you have input in the dialog are invalid! Please try again.");
-                    loginDialog.Show(response.Player);
-                }
-                catch (Exception)
-                {
-                    Message.SendServerMessageToPlayer(response.Player, MessageType.Error, "There has been an error on the server, please try again.");
-                    loginDialog.Show(response.Player);
-                }
+            }
+            else
+            {
+                loginDialog.Show(response.Player);
             }
         }
     }

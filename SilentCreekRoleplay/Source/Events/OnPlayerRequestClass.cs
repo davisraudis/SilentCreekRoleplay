@@ -27,9 +27,10 @@ namespace SilentCreekRoleplay.Server.Source.Events
                 if(playerEntity != null)
                 {
                     var spawnCoordinates = new Vector3(playerEntity.X, playerEntity.Y, playerEntity.Z);
-                    var spawnRotation = 269.1F;
+                    var spawnRotation = playerEntity.A;
+                    var spawnSkin = playerEntity.Skin;
 
-                    player.SetSpawnInfo(0, 12, spawnCoordinates, spawnRotation);
+                    player.SetSpawnInfo(0, spawnSkin, spawnCoordinates, (float)spawnRotation);
                     player.Spawn();
                 }
                 else

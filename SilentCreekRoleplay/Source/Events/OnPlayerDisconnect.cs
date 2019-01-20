@@ -41,7 +41,10 @@ namespace SilentCreekRoleplay.Server.Source.Events
                             Name = player.Name,
                             X = player.Position.X,
                             Y = player.Position.Y,
-                            Z = player.Position.Z
+                            Z = player.Position.Z,
+                            A = player.Angle,
+                            Skin = player.Skin,
+                            Health = player.Health
                         };
 
                         _playerManager.SavePlayer(db, playerData);

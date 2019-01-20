@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Numerics;
 
 /*
- C:\Users\Davis\source\repos\SilentCreekRoleplay\ClassLibrary1>dotnet ef migrations add InitialCreate --startup-project ../SilentCreekRoleplay/
+    dotnet ef migrations add InitialCreate --startup-project ../SilentCreekRoleplay/
 */
 namespace SilentCreekRoleplay.DataLayer.Entities
 {
@@ -22,5 +21,13 @@ namespace SilentCreekRoleplay.DataLayer.Entities
         public double Y { get; set; }
 
         public double Z { get; set; }
+
+        public double A { get; set; }
+
+        public int Money { get; set; }
+
+        public double Health { get; set; }
+
+        public int Skin { get; set; }
     }
 }

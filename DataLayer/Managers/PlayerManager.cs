@@ -18,13 +18,17 @@ namespace SilentCreekRoleplay.DataLayer.Managers
 
         public void RegisterPlayer(SilentCreekRoleplayContext db, string name, string password)
         {
-            var player = new Player
+            var exist = db.Players.Any(p => p.Name == name);
+            if (!exist)
             {
-                Name = name,
-                Password = Utils.CreateMD5(password)
-            };
+                var player = new Player
+                {
+                    Name = name,
+                    Password = Utils.CreateMD5(password)
+                };
 
-            db.Players.Add(player);
+                db.Players.Add(player);
+            }
         }
 
         public void LoginPlayer(SilentCreekRoleplayContext db, string name, string password)
@@ -51,9 +55,8 @@ namespace SilentCreekRoleplay.DataLayer.Managers
                 foundPlayer.X = player.X;
                 foundPlayer.Y = player.Y;
                 foundPlayer.Z = player.Z;
+                foundPlayer.A = player.A;
             }
         }
-
-
     }
 }

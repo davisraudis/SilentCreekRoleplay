@@ -8,6 +8,6 @@ namespace SilentCreekRoleplay.Server.Source
     {
         public static string ServerName = "Silent Creek Roleplay";
 
-        public static string ServerVersion = "0.1";
+        public static string ServerVersion = "0.1-alpha";
     }
 }
