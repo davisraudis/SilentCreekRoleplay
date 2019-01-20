@@ -13,11 +13,9 @@ namespace SilentCreekRoleplay.Server.Source.Events
     class OnPlayerDisconnect : IEventListener, IController
     {
         private PlayerManager _playerManager = new PlayerManager();
-        private List<PlayerSession> _loginSessions;
 
-        public OnPlayerDisconnect(List<PlayerSession> loginSessions)
+        public OnPlayerDisconnect()
         {
-            _loginSessions = loginSessions;
         }
 
         public void RegisterEvents(BaseMode gameMode)
@@ -27,12 +25,11 @@ namespace SilentCreekRoleplay.Server.Source.Events
 
         private void SavePlayerData(object sender, EventArgs e)
         {
-            var player = sender as BasePlayer;
-            var session = _loginSessions.FirstOrDefault(l => ReferenceEquals(l.Player, player));
+            var player = sender as PlayerSession;
 
-            if (session != null)
+            if (player != null)
             {
-                if (session.Authenticated)
+                if (player.Authenticated)
                 {
                     using (SilentCreekRoleplayContext db = new SilentCreekRoleplayContext())
                     {
@@ -52,7 +49,6 @@ namespace SilentCreekRoleplay.Server.Source.Events
                     }
                 }
 
-                _loginSessions.Remove(session);
             }
             else
             {

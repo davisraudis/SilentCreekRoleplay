@@ -1,12 +1,12 @@
-﻿using SampSharp.GameMode.World;
+﻿using SampSharp.GameMode.Pools;
+using SampSharp.GameMode.World;
 using SilentCreekRoleplay.DataLayer.Entities;
 
 namespace SilentCreekRoleplay.Server
 {
-    public class PlayerSession
+    [PooledType]
+    public class PlayerSession : BasePlayer
     {
-        public BasePlayer Player { get; set; }
-
         public Player PlayerData { get; set; }
 
         public bool Authenticated { get; set; }

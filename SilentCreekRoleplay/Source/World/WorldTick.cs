@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+using System.Timers;
 
 namespace SilentCreekRoleplay.Server.Source.World
 {
@@ -12,13 +10,13 @@ namespace SilentCreekRoleplay.Server.Source.World
 
     public static class WorldTick
     {
+        private static readonly int updateTimeInterval = (int)TimeSpan.FromHours(1).TotalMilliseconds;
+        private static readonly int updateWorldWeatherInterval = (int)TimeSpan.FromHours(4).TotalMilliseconds;
+
         public static void TickWorld(object timerState)
         {
             var state = timerState as WorldTimerState;
-            Interlocked.Increment(ref state.Counter);
 
-            var updateTimeInterval = (int)TimeSpan.FromHours(1).TotalMilliseconds;
-            var updateWorldWeatherInterval = (int)TimeSpan.FromHours(4).TotalMilliseconds;
             if (state.Counter % updateTimeInterval == 0 || state.Counter == 1)
             {
                 Time.Update();
@@ -27,6 +25,18 @@ namespace SilentCreekRoleplay.Server.Source.World
             {
                 Weather.Update();
             }
+
+            state.Counter ++;
+        }
+
+        public static void SetupTimer()
+        {
+            Timer ServerTick = new Timer();
+            var serverTickTimerState = new WorldTimerState { Counter = 0 };
+
+            ServerTick.Elapsed += (sender, e) => TickWorld(serverTickTimerState);
+            ServerTick.Interval = 1000;
+            ServerTick.Start();
         }
     }
 }

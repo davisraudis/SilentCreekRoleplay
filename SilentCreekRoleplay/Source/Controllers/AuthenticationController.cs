@@ -16,7 +16,6 @@ namespace SilentCreekRoleplay.Server.Controllers
     {
 
         private PlayerManager _playerManager = new PlayerManager();
-        private List<PlayerSession> _playerSessions = new List<PlayerSession>();
 
         private InputDialog registerDialog = new InputDialog("Register",
                                             $@"Welcome to {ServerUtils.ServerName}                                              
@@ -29,9 +28,8 @@ namespace SilentCreekRoleplay.Server.Controllers
                                             true,
                                             "Login");
 
-        public AuthenticationController(List<PlayerSession> playerSessions)
+        public AuthenticationController()
         {
-            _playerSessions = playerSessions;
             registerDialog.Response += RegisterDialogResponse;
             loginDialog.Response += LoginDialogResponse;
         }
@@ -41,13 +39,14 @@ namespace SilentCreekRoleplay.Server.Controllers
             registerDialog.Show(player);
         }
 
-        public void ShowLoginDialog(List<PlayerSession> loginSessions, BasePlayer player)
+        public void ShowLoginDialog(PlayerSession player)
         {
             loginDialog.Show(player);
         }
 
         private void RegisterDialogResponse(object sender, DialogResponseEventArgs response)
         {
+            var player = response.Player as PlayerSession;
             if (response.DialogButton == DialogButton.Left)
             {
                 if (response.InputText.Length > 6 && response.InputText.Length < 32)
@@ -56,47 +55,45 @@ namespace SilentCreekRoleplay.Server.Controllers
                     {
                         try
                         {
-                            _playerManager.RegisterPlayer(db, response.Player.Name, response.InputText);
+                            _playerManager.RegisterPlayer(db, player.Name, response.InputText);
                             db.SaveChanges();
 
                             loginDialog.Show(response.Player);
                         }
                         catch (Exception)
                         {
-                            Message.SendServerMessageToPlayer(response.Player, MessageType.Error, "There has been an error on the server, please try again.");
-                            registerDialog.Show(response.Player);
+                            Message.SendServerMessageToPlayer(player, MessageType.Error, "There has been an error on the server, please try again.");
+                            registerDialog.Show(player);
                         }
                     }
                 }
                 else
                 {
-                    registerDialog.Show(response.Player);
+                    registerDialog.Show(player);
                 }
             }
             else
             {
-                registerDialog.Show(response.Player);
+                registerDialog.Show(player);
             }
         }
 
         private void LoginDialogResponse(object sender, DialogResponseEventArgs response)
         {
+            var player = response.Player as PlayerSession;
             if (response.DialogButton == DialogButton.Left)
-            {
+            {              
                 using (SilentCreekRoleplayContext db = new SilentCreekRoleplayContext())
                 {
                     try
                     {
-                        _playerManager.LoginPlayer(db, response.Player.Name, response.InputText);
+                        _playerManager.LoginPlayer(db, player.Name, response.InputText);
 
-                        var playerEntity = _playerManager.GetPlayerEntityByPlayerName(db, response.Player.Name);
+                        var playerEntity = _playerManager.GetPlayerEntityByPlayerName(db, player.Name);
                         Message.SendServerMessageToPlayer(response.Player, MessageType.Information, $"You have logged in as {response.Player.Name}.");
-                        _playerSessions.Add(new PlayerSession
-                        {
-                            Player = response.Player,
-                            PlayerData = playerEntity,
-                            Authenticated = true
-                        });
+
+                        player.Authenticated = true;
+                        player.PlayerData = playerEntity;
                     }
                     catch (FailedLoginException)
                     {
@@ -112,7 +109,7 @@ namespace SilentCreekRoleplay.Server.Controllers
             }
             else
             {
-                loginDialog.Show(response.Player);
+                loginDialog.Show(player);
             }
         }
     }

@@ -16,34 +16,20 @@ namespace SilentCreekRoleplay.Server.source
     {
         private PlayerManager _playerManager = new PlayerManager();
         private AuthenticationController _authenticationController;
-        private List<PlayerSession> _playerSessions = new List<PlayerSession>();
 
-        public OnPlayerConnect(List<PlayerSession> playerSessions)
+        public OnPlayerConnect()
         {
-            _playerSessions = playerSessions;
-            _authenticationController = new AuthenticationController(playerSessions);
+            _authenticationController = new AuthenticationController();
         }
 
         public void RegisterEvents(BaseMode gameMode)
         {
-            gameMode.PlayerConnected += ValidateSession;
             gameMode.PlayerConnected += LoadPlayerFromDatabase;
-        }
-
-        private void ValidateSession(object sender, EventArgs e)
-        {
-            var player = sender as BasePlayer;
-            var session = _playerSessions.FirstOrDefault(s => s.Player.Name == player.Name);
-
-            if(session != null)
-            {
-                _playerSessions.Remove(session);
-            }
         }
 
         private void LoadPlayerFromDatabase(object sender, EventArgs e)
         {
-            var player = sender as BasePlayer;
+            var player = sender as PlayerSession;
             using (SilentCreekRoleplayContext db = new SilentCreekRoleplayContext())
             {
                 var playerEntity = _playerManager.GetPlayerEntityByPlayerName(db, player.Name);
@@ -52,7 +38,7 @@ namespace SilentCreekRoleplay.Server.source
                 {
                     Message.SendServerMessageToPlayer(player, Enums.MessageType.Information, $"Welcome back to {ServerUtils.ServerName}!");
                     Message.SendServerMessageToPlayer(player, Enums.MessageType.Information, $"Please login, input the password to your account in the dialog in order to proceed.");
-                    _authenticationController.ShowLoginDialog(_playerSessions, player);
+                    _authenticationController.ShowLoginDialog(player);
                 }
                 else
                 {

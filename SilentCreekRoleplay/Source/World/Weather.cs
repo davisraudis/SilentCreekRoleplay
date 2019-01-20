@@ -56,7 +56,7 @@ namespace SilentCreekRoleplay.Server.Source.World
                     weatherId = 9;
                 }
             }
-            catch(Exception e)
+            catch(Exception)
             {
 
             }

@@ -18,12 +18,10 @@ namespace SilentCreekRoleplay.Server.Source.Events
 
         private void spawnPlayer(object sender, EventArgs e)
         {
-            var player = sender as BasePlayer;
-
+            var player = sender as PlayerSession;
             using (SilentCreekRoleplayContext db = new SilentCreekRoleplayContext())
             {
-                var playerEntity = _playerManager.GetPlayerEntityByPlayerName(db, player.Name);
-
+                var playerEntity = player.PlayerData;
                 if(playerEntity != null)
                 {
                     var spawnCoordinates = new Vector3(playerEntity.X, playerEntity.Y, playerEntity.Z);
